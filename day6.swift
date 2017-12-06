@@ -1,12 +1,14 @@
 let input = [4, 10, 4, 1, 8, 4, 9, 14, 5, 1, 14, 15, 0, 15, 3, 5]
 var banks = input
 var banksHash = 0
-var memory = [Int]()
+var memory = Set<Int>()
+var distances = [Int : Int]()
 var cycles = 0
 
 repeat {
     // Save banks state to compare late
-    memory.append(banksHash)
+    memory.insert(banksHash)
+    distances[banksHash] = cycles
     
     // In beginning of each cycle find max blocks
     var maxBlocks = 0
@@ -35,21 +37,15 @@ repeat {
         blocks -= 1
     }
     
-    // Count cycles
-    cycles += 1
-    
     //Calculate hash of current banks state
     banksHash = banks.flatMap { String($0) }.joined().hashValue
+    
+    // Count cycles
+    cycles += 1
 } while !memory.contains(banksHash)
 
 print(cycles)
 
-var loopSize = 0
-
-for (index, oldBanks) in memory.enumerated() {
-    if banksHash == oldBanks {
-        loopSize = memory.count - index
-    }
-}
+var loopSize = memory.count - distances[banksHash]!
 
 print(loopSize)
