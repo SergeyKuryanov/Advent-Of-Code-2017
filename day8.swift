@@ -12,24 +12,22 @@ func value(of register: String) -> Int {
     return registers[register] ?? 0
 }
 
-func isConditionMet(register: String, condition: String, amount: Int) -> Bool {
-    let registerValue = value(of: register)
-    
-    switch condition {
+func eval(_ operation: String) -> (Int, Int) -> Bool {
+    switch operation {
     case ">":
-        return registerValue > amount
+        return (>)
     case "<":
-        return registerValue < amount
+        return (<)
     case ">=":
-        return registerValue >= amount
+        return (>=)
     case "<=":
-        return registerValue <= amount
+        return (<=)
     case "==":
-        return registerValue == amount
+        return (==)
     case "!=":
-        return registerValue != amount
+        return (!=)
     default:
-        return false
+        return (==)
     }
 }
 
@@ -43,27 +41,28 @@ func perform(operation: String, register: String, amount: Int) {
         registerValue -= amount
     }
     
-    maxRegisterValue = max(maxRegisterValue, registerValue)
     registers[register] = registerValue
+    
+    maxRegisterValue = max(maxRegisterValue, registerValue)
 }
 
 for inputString in input.split(separator: "\n") {
     let instructions = inputString.split(separator: " ")
     let register = String(instructions[0])
     let operation = String(instructions[1])
-    guard let amount = Int(instructions[2]) else { print("continue"); continue }
+    guard let amount = Int(instructions[2]) else { continue }
     
     let conditionRegister = String(instructions[4])
     let conditionOperator = String(instructions[5])
-    guard let conditionAmount = Int(instructions[6]) else { print("continue"); continue }
+    guard let conditionValue = Int(instructions[6]) else { continue }
     
-    if isConditionMet(register: conditionRegister, condition: conditionOperator, amount: conditionAmount) {
+    if eval(conditionOperator)(value(of: conditionRegister), conditionValue) {
         perform(operation: operation, register: register, amount: amount)
     }
 }
 
 if let greatestRegister = registers.max (by: { $0.value < $1.value  }) {
-    print(greatestRegister)    
+    print(greatestRegister)
 }
 
 print(maxRegisterValue)
