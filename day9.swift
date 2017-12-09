@@ -3,30 +3,27 @@ let input = "{{<a!>},{<a!>},{<a!>},{<ab>}}"
 var totalScore = 0
 var groups = 0
 
-var skipNext = false
+var isSkipNext = false
 var isInsideGarbarage = false
 
 var garbarageCharacters = 0
 
 for character in input {
-    if skipNext {
-        skipNext = false
-        continue
-    }
-    
-    switch character {
-    case "{" where !isInsideGarbarage:
+    switch (character, isInsideGarbarage, isSkipNext) {
+    case (_, _, true):
+        isSkipNext = false
+    case ("!", _, false):
+        isSkipNext = true
+    case ("{", false, false):
         groups += 1
         totalScore += groups
-    case "}" where !isInsideGarbarage:
+    case ("}", false, false):
         groups -= 1
-    case "<" where !isInsideGarbarage:
+    case ("<", false, false):
         isInsideGarbarage = true
-    case ">" where isInsideGarbarage:
+    case (">", true, false):
         isInsideGarbarage = false
-    case "!":
-        skipNext = true
-    case _ where isInsideGarbarage:
+    case (_, true, false):
         garbarageCharacters += 1
     default:
         break
